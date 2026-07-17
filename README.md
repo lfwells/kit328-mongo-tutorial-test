@@ -1,24 +1,23 @@
-# Sample A1 server with Node+Express and MongoDB
+# Starting point for a deployable MongoDB tutorial
+I could have done a version of this without deployment stuff in it, but the Assig 1 base code will need this
+Note, things getting messier and messier about base-paths due to not using subdomains
 
-## Local testing (with Docker)
-To test on your own machine, navigate to the root of the directory and run
+## Running the project
+Within the terminal on the codespace run
 ```sh
 docker compose up -d
 ```
-Then visit [http://localhost:5001/data](http://localhost:5001/data), or [http://localhost:5001/health](http://localhost:5001/health)
+And visit the forwarded port 3002
 
-## Production Testing (on kit328.utas.edu.au)
-1. SSH into server
-2. Navigate to where I have already cloned the repo
+## Populating the database
+Here you can populate the db with some seed data:
 ```sh
-cd ~/a1_api
+docker exec -i db-student-app mongosh "mongodb://root:student_secure_pass@localhost:27017/student_db?authSource=admin" --eval "db.tasks.insertMany([{title: 'Complete KIT328 Tutorial', completed: false}, {title: 'Fix Docker Networking Hooks', completed: true}])"
 ```
-3. Pull any changes
+
+## Debugging
+You can check the logs of the services using the following
 ```sh
-git pull
+docker logs frontend-student-app
+docker logs backend-student-app
 ```
-4. Rebuild the container
-```sh
-sudo docker compose up -d --build
-```
-5. Then visit [https://kit328.ict.utas.edu.au/a1_api/data](https://kit328.ict.utas.edu.au/a1_api/data), or [https://kit328.ict.utas.edu.au/a1_api/health](https://kit328.ict.utas.edu.au/a1_api/health)
