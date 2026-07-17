@@ -1,0 +1,33 @@
+name: Deployment Server Status
+
+on:
+  repository_dispatch:
+    types: [ deployment_result ]
+
+jobs:
+  display-deployment-results:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Server Output Logs
+        run: |
+          echo "=== DEPLOYMENT LOGS ==="
+          echo "${{ github.event.client_payload.logs }}"
+          
+      - name: Generate Job Summary Markdown
+        run: |
+          echo "### 🚀 Deployment Status: ${{ github.event.client_payload.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ github.event.client_payload.status }}" = "success" ]; then
+            echo "#### ✅ Your project is live and tracking properly!" >> $GITHUB_STEP_SUMMARY
+            echo "🔗 **Live URL:** [${{ github.event.client_payload.url }}](${{ github.event.client_payload.url }})" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "#### ❌ Deployment encountered an assembly error." >> $GITHUB_STEP_SUMMARY
+            echo "Review the raw server output logs below or in the console history." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: Check Deployment Status
+        if: github.event.client_payload.status == 'failure'
+        run: |
+          echo "❌ Server deployment failed validation or container assembly error."
+          exit 1

@@ -1,0 +1,23 @@
+name: Trigger Assignment Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual run'
+        required: false
+        default: 'Manual testing'
+
+jobs:
+  notify-deployment-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Deployment Signal
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CLASSROOM_DEPLOYMENT_TOKEN }}
+          repository: UTAS-KIT328/kit328-deployment
+          event-type: student_push
+          client-payload: '{"repo": "${{ github.repository }}", "actor": "${{ github.actor }}"}'

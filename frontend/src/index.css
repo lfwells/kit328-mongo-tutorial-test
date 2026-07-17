@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    padding: 20px;
+    color: #333;
+}
+
+.app-container {
+    max-width: 450px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.yeller-section {
+    background-color: #f1f5f9;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    margin-bottom: 25px;
+}
+
+.yeller-input {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #94a3b8;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+
+.yeller-output {
+    font-family: monospace;
+    font-size: 1.2rem;
+    color: #dc2626;
+    word-break: break-all;
+    margin-top: 10px;
+}
+
+.counter-box {
+    border: 1px solid #e2e8f0;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 6px;
+    background-color: #fafafa;
+}
+
+.counter-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 1px solid #cbd5e1;
+    background-color: white;
+    border-radius: 4px;
+}
+
+.counter-btn:hover {
+    background-color: #f8fafc;
+}

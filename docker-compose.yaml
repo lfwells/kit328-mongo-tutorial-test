@@ -1,0 +1,62 @@
+# ./docker-compose.yaml
+services:
+  # 1. FRONTEND: Vite + React UI Layer
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REPO_NAME=${REPO_NAME}
+    container_name: frontend-${REPO_NAME:-student-app}
+    restart: always
+    depends_on:
+      - backend_api
+    environment:
+      - VITE_API_URL=/${REPO_NAME:-student-app}/api
+    networks:
+      - caddy_network
+    labels:
+      caddy: kit328.ict.utas.edu.au
+      # Dynamic path matching rule targeting the student project namespace
+      caddy.handle_path: /${REPO_NAME:-unknown-app}*
+      caddy.handle_path.0_reverse_proxy: "{{upstreams 3000}}"
+
+  # 2. BACKEND: Node + Express API Layer
+  backend_api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-${REPO_NAME:-student-app}
+    restart: always
+    depends_on:
+      - db_service
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - MONGO_URI=mongodb://root:student_secure_pass@db_service:27017/student_db?authSource=admin
+    networks:
+      - caddy_network
+    # In production, Caddy targets the frontend container on /path*, 
+    # and the frontend proxies or forwards internal requests directly inside the Docker mesh network.
+
+  # 3. DATABASE: MongoDB Storage Layer
+  db_service:
+    image: mongo:7.0
+    container_name: db-${REPO_NAME:-student-app}
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=student_secure_pass
+    volumes:
+      - student_mongo_data:/data/db
+    networks:
+      - caddy_network
+
+networks:
+  caddy_network:
+    name: caddy_network
+    # Toggles to local bridge mode in Codespaces, binds to the production proxy on the live host
+    external: ${IS_PRODUCTION:-false}
+
+volumes:
+  student_mongo_data:
+    name: mongo_data_${REPO_NAME:-student_app}
