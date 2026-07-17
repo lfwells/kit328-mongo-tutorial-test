@@ -9,8 +9,8 @@ export default function App() {
 
     // 2. Trigger the network request automatically when the page loads
     useEffect(() => {
-        // Automatically adapts to local dev ports or production server subpaths
-        const API_BASE = import.meta.env.VITE_API_URL || '/api';
+        // Dynamically handles local dev ('/api') and production subfolders ('/kit328-mongo-tutorial-test/api')
+        const API_BASE = `${import.meta.env.BASE_URL}api`.replace(/\/+/g, '/'); 
 
         fetch(`${API_BASE}/data`)
             .then((res) => {
