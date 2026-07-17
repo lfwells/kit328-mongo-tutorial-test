@@ -5,7 +5,7 @@ Note, things getting messier and messier about base-paths due to not using subdo
 ## Running the project
 Within the terminal on the codespace run
 ```sh
-docker compose -f docker-compose.yaml -f docker-compose.override.yaml up -d
+docker compose up -d
 ```
 And visit the forwarded port 3002
 
