@@ -21,3 +21,6 @@ You can check the logs of the services using the following
 docker logs frontend-student-app
 docker logs backend-student-app
 ```
+> 💡 **Troubleshooting a 502 Bad Gateway in Codespaces:**
+> If you visit your frontend dashboard link and see a `502 Bad Gateway` error even though your terminal says Vite is ready, the Codespaces proxy agent has cached an initialization failure. 
+> To fix this instantly: Open the **Ports** tab in your bottom panel, right-click port **3002**, select **Remove Port**, and then manually re-add port **3002** to clear the routing cache!
