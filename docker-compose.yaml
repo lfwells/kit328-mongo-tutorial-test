@@ -35,6 +35,13 @@ services:
       - MONGO_URI=mongodb://root:student_secure_pass@db_service:27017/student_db?authSource=admin
     networks:
       - caddy_network
+    labels:
+      # 1. Intercept the subfolder API path and automatically strip the repo name prefix
+      caddy.handle_path: /${REPO_NAME:-unknown-app}/api*
+      # 2. Prepend a clean '/api' back onto the URI path so Express gets exactly /api/data
+      caddy.handle_path.0_rewrite: "* /api{uri}"
+      # 3. Securely reverse proxy the scrubbed traffic directly to your backend Node container on port 5000
+      caddy.handle_path.1_reverse_proxy: "{{upstreams 5000}}"
     # In production, Caddy targets the frontend container on /path*, 
     # and the frontend proxies or forwards internal requests directly inside the Docker mesh network.
 
