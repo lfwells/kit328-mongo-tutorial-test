@@ -18,8 +18,19 @@ services:
     labels:
       caddy: kit328.ict.utas.edu.au
       # Dynamic path matching rule targeting the student project namespace
-      caddy.handle_path: /${REPO_NAME:-unknown-app}*
-      caddy.handle_path.0_reverse_proxy: "{{upstreams 3000}}"
+      # lfwells: this is getting reeeally messy now
+      # Step 1: Tell Caddy to evaluate these route parameters sequentially
+      caddy.route: /${REPO_NAME:-unknown-app}*
+      
+      # Step 2: Handle the API calls first. If the path matches /api*, handle it here
+      caddy.route.0_handle_path: /${REPO_NAME:-unknown-app}/api*
+      caddy.route.0_handle_path.0_rewrite: "* /api{uri}"
+      # Directly proxy traffic to the internal backend container name on port 5000
+      caddy.route.0_handle_path.1_reverse_proxy: "http://backend-${REPO_NAME:-student-app}:5000"
+      
+      # Step 3: Fallback for all other traffic (assets/index.html) -> Frontend container on port 3000
+      caddy.route.1_handle_path: /${REPO_NAME:-unknown-app}*
+      caddy.route.1_handle_path.0_reverse_proxy: "{{upstreams 3000}}"
 
   # 2. BACKEND: Node + Express API Layer
   backend_api:
@@ -35,15 +46,6 @@ services:
       - MONGO_URI=mongodb://root:student_secure_pass@db_service:27017/student_db?authSource=admin
     networks:
       - caddy_network
-    labels:
-      # 1. Intercept the subfolder API path and automatically strip the repo name prefix
-      caddy.handle_path: /${REPO_NAME:-unknown-app}/api*
-      # 2. Prepend a clean '/api' back onto the URI path so Express gets exactly /api/data
-      caddy.handle_path.0_rewrite: "* /api{uri}"
-      # 3. Securely reverse proxy the scrubbed traffic directly to your backend Node container on port 5000
-      caddy.handle_path.1_reverse_proxy: "{{upstreams 5000}}"
-    # In production, Caddy targets the frontend container on /path*, 
-    # and the frontend proxies or forwards internal requests directly inside the Docker mesh network.
 
   # 3. DATABASE: MongoDB Storage Layer
   db_service:
