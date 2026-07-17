@@ -6,7 +6,7 @@
 
     // Magic Startup Commands
     "postCreateCommand": "git config --global core.hooksPath /dev/null",
-    "postStartCommand": "docker compose up -d",
+    //"postStartCommand": "docker compose up -d",
 
     // Magic that makes the docker image work within the Codespace
     "features": {
