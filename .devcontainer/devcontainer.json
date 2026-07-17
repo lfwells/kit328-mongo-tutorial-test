@@ -26,12 +26,15 @@
     },
 
     // Forwarding ports and giving them names
-    "forwardPorts": [3000],
-  
+    "forwardPorts": [3002, 5002],
     "portsAttributes": {
-        "3000": {
-        "label": "React/Vite Application",
-        "onAutoForward": "openBrowser"
+        "3002": {
+            "label": "Frontend (React Dashboard)",
+            "onAutoForward": "notify"
+        },
+        "5002": {
+            "label": "Backend (Express API)",
+            "onAutoForward": "silent"
         }
     }
 }
