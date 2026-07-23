@@ -5,32 +5,25 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        - REPO_NAME=${REPO_NAME}
     container_name: frontend-${REPO_NAME:-student-app}
     restart: always
     depends_on:
       - backend_api
     environment:
-      - VITE_API_URL=/${REPO_NAME:-student-app}/api
+      - VITE_API_URL=/api
     networks:
       - caddy_network
     labels:
-      caddy: kit328.ict.utas.edu.au
-      # Dynamic path matching rule targeting the student project namespace
-      # lfwells: this is getting reeeally messy now
-      # Step 1: Tell Caddy to evaluate these route parameters sequentially
-      caddy.route: /${REPO_NAME:-unknown-app}*
-      
-      # Step 2: Handle the API calls first. If the path matches /api*, handle it here
-      caddy.route.0_handle_path: /${REPO_NAME:-unknown-app}/api*
-      caddy.route.0_handle_path.0_rewrite: "* /api{uri}"
-      # Directly proxy traffic to the internal backend container name on port 5000
-      caddy.route.0_handle_path.1_reverse_proxy: "http://backend-${REPO_NAME:-student-app}:5000"
-      
-      # Step 3: Fallback for all other traffic (assets/index.html) -> Frontend container on port 3000
-      caddy.route.1_handle_path: /${REPO_NAME:-unknown-app}*
-      caddy.route.1_handle_path.0_reverse_proxy: "{{upstreams 3000}}"
+      # 🚀 Dynamic Subdomain: app1.kit328.ict.utas.edu.au
+      caddy: ${REPO_NAME:-student-app}.kit328.ict.utas.edu.au
+
+      # Route 1: Direct all /api/* requests straight to the backend container
+      caddy.handle_path: /api*
+      caddy.handle_path.reverse_proxy: "http://backend-${REPO_NAME:-student-app}:5000"
+
+      # Route 2: Fallback for all other traffic (React app / static assets)
+      caddy.handle: "/*"
+      caddy.handle.reverse_proxy: "{{upstreams 3000}}"
 
   # 2. BACKEND: Node + Express API Layer
   backend_api:
@@ -63,7 +56,6 @@ services:
 networks:
   caddy_network:
     name: caddy_network
-    # Toggles to local bridge mode in Codespaces, binds to the production proxy on the live host
     external: ${IS_PRODUCTION:-false}
 
 volumes:
