@@ -9,8 +9,8 @@ export default function App() {
 
     // 2. Trigger the network request automatically when the page loads
     useEffect(() => {
-        // Dynamically handles local dev ('/api') and production subfolders ('/kit328-mongo-tutorial-test/api')
-        const API_BASE = `${import.meta.env.BASE_URL}api`.replace(/\/+/g, '/'); 
+        // 💡 Always points cleanly to https://subdomain.kit328.ict.utas.edu.au/api
+        const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
         fetch(`${API_BASE}/data`)
             .then((res) => {
