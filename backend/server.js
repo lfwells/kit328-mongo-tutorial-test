@@ -36,7 +36,7 @@ apiRouter.get('/data', async (req, res) => {
 });
 
 // 3. Bind the router footprint universally to the '/api' base path
-app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 // Database Connection backoff loop remains exactly the same below...
 
